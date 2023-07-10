@@ -257,13 +257,13 @@ class Maze:
     
     def back_tracking_r_2(self, back_tracking_dict):
         
-        p = (self._num_cols-1, self._num_rows-1)
+        start = (self._num_cols-1, self._num_rows-1)
         end = (0, 0)
-        while back_tracking_dict[(p[0],p[1])] != end:
-            s = p
-            p = back_tracking_dict[(p[0],p[1])]
-            self._cells[s[0]][s[1]].draw_move(self._cells[p[0]][p[1]], False)
+        current = start
+        while current != end:
+            temp = current
+            current = back_tracking_dict[(current[0],current[1])]
+            self._cells[temp[0]][temp[1]].draw_move(self._cells[current[0]][current[1]], False)
             self._animate()
-        s = p
-        self._cells[s[0]][s[1]].draw_move(self._cells[0][0], False)
+
         return True
