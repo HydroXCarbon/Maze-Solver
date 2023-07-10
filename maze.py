@@ -142,54 +142,128 @@ class Maze:
             for j in range(self._num_rows):
                 self._cells[i][j].visited = False
 
-    def solve(self):
-        return self._solve_r(0, 0)
+    def solve_dfs(self):
+        return self._solve_r_1(0, 0)
 
-    def _solve_r(self, i, j):
+    def _solve_r_1(self, i, j):
         self._animate()
         self._cells[i][j].visited = True
 
-        #check end
+        # check end
         if i == self._num_cols-1 and j == self._num_rows-1:
             return True
         
-        #check all direction
+        # check all direction
 
-        #check bottom
+        # check bottom
         if j < self._num_rows-1 and not self._cells[i][j].has_bottom_wall and not self._cells[i][j+1].visited:
             self._cells[i][j].draw_move(self._cells[i][j+1])
-            if self._solve_r(i, j+1):
+            if self._solve_r_1(i, j+1):
                 return True
             else:
                 self._cells[i][j].draw_move(self._cells[i][j+1], True)
                         
-        #check right
+        # check right
         if i < self._num_cols-1 and not self._cells[i][j].has_right_wall and not self._cells[i+1][j].visited:
             self._cells[i][j].draw_move(self._cells[i+1][j])
-            if self._solve_r(i+1, j):
+            if self._solve_r_1(i+1, j):
                 return True
             else:
                 self._cells[i][j].draw_move(self._cells[i+1][j], True)
 
-        #check top
+        # check top
         if j > 0 and not self._cells[i][j].has_top_wall and not self._cells[i][j-1].visited:
             self._cells[i][j].draw_move(self._cells[i][j-1])
-            if self._solve_r(i, j-1):
+            if self._solve_r_1(i, j-1):
                 return True
             else:
                 self._cells[i][j].draw_move(self._cells[i][j-1], True)
 
-        #check left
+        # check left
         if i > 0 and not self._cells[i][j].has_left_wall and not self._cells[i-1][j].visited:
             self._cells[i][j].draw_move(self._cells[i-1][j])
-            if self._solve_r(i-1, j):
+            if self._solve_r_1(i-1, j):
                 return True
             else:
                 self._cells[i][j].draw_move(self._cells[i-1][j], True)
 
         return False
 
+    def solve_bfs(self):
+        return self._solve_r_2(0, 0) 
+    
+    def _solve_r_2(self, i, j):
+        back_tracking_dict = {}
+        to_visit = []
+        to_visit.append([i, j, 0])
+        while to_visit:
+            neighbours = []
+            s = to_visit.pop(0)
+            i = s[0]
+            j = s[1]
+            direction = s[2]
+            self._cells[i][j].visited = True
+
+            # knock walls
+            if direction is not 0:
+                
+                # knock top
+                if direction == 1:
+                    self._cells[i][j+1].draw_move(self._cells[i][j], True)
+                # knock right
+                elif direction == 2:
+                    self._cells[i-1][j].draw_move(self._cells[i][j], True)
+                # knock bottom
+                elif direction == 3:
+                    self._cells[i][j-1].draw_move(self._cells[i][j], True)
+                # knock left
+                elif direction == 4:
+                    self._cells[i+1][j].draw_move(self._cells[i][j], True)
+
+                self._animate()
+
+            # check end
+            if i == self._num_cols-1 and j == self._num_rows-1:
+                self.back_tracking_r_2(back_tracking_dict)
+                return True
             
-            
-            
-           
+            # check all direction
+
+            # check bottom
+            if j < self._num_rows-1 and not self._cells[i][j].has_bottom_wall and not self._cells[i][j+1].visited:
+                neighbours.append([i, j+1, 3])
+                back_tracking_dict[(i, j+1)] = (i, j)
+
+            # check right
+            if i < self._num_cols-1 and not self._cells[i][j].has_right_wall and not self._cells[i+1][j].visited:
+                neighbours.append([i+1, j, 2])
+                back_tracking_dict[(i+1, j)] = (i, j)
+
+            # check top
+            if j > 0 and not self._cells[i][j].has_top_wall and not self._cells[i][j-1].visited:
+                neighbours.append([i, j-1, 1])
+                back_tracking_dict[(i, j-1)] = (i, j)
+
+            # check left
+            if i > 0 and not self._cells[i][j].has_left_wall and not self._cells[i-1][j].visited:
+                neighbours.append([i-1, j, 4])
+                back_tracking_dict[(i-1, j)] = (i, j)
+
+            random.shuffle(neighbours)
+            for neighbour in neighbours:
+                to_visit.append(neighbour)
+        
+        return False
+    
+    def back_tracking_r_2(self, back_tracking_dict):
+        
+        p = (self._num_cols-1, self._num_rows-1)
+        end = (0, 0)
+        while back_tracking_dict[(p[0],p[1])] != end:
+            s = p
+            p = back_tracking_dict[(p[0],p[1])]
+            self._cells[s[0]][s[1]].draw_move(self._cells[p[0]][p[1]], False)
+            self._animate()
+        s = p
+        self._cells[s[0]][s[1]].draw_move(self._cells[0][0], False)
+        return True

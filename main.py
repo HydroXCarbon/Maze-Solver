@@ -15,12 +15,11 @@ def main():
 
     win = Window(screen_x, screen_y)
 
-    for i in range(10):
+    for i in range(100):
         maze = Maze(random_index, margin, margin, num_rows, num_cols, cell_size_x, cell_size_y, win, seed)
-        maze.solve()
+        maze.solve_bfs()
         win.clear()
         
     win.wait_for_close()
-
 
 main()
