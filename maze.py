@@ -25,7 +25,7 @@ class Maze:
         self._cell_size_y = cell_size_y
         self._win = win
         self._random = random_index
-        if seed:
+        if seed is 0:
             random.seed(seed)
         
         self._create_cells()
@@ -266,4 +266,4 @@ class Maze:
             self._cells[temp[0]][temp[1]].draw_move(self._cells[current[0]][current[1]], False)
             self._animate()
 
-        return True
+        return 
